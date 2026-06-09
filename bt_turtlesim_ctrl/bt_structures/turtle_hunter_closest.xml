@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+  TURTLE HUNTER — CLOSEST-FIRST STRATEGY
+  ============================================================================
+  Strategy: always hunt the nearest prey turtle (greedy by Euclidean distance).
+
+  Tree logic
+  ──────────
+  Repeat(∞)
+    ForceSuccess
+      Sequence "HuntOneTurtle"
+        Fallback "WaitForPrey"
+          HasTargetTurtles
+          WaitForTurtle(1 s)
+        SelectNextTurtle(strategy="closest")   ← re-evaluated every hunt cycle
+        MoveTurtleToTarget                     ← prop controller
+        CatchTurtle
+
+  Key difference vs sequential:
+    SelectNextTurtle recalculates the nearest turtle at the START of each
+    hunt cycle. If a closer turtle has been spawned since the last catch, it
+    will be targeted next.
+
+  Connect Groot2 to port 1669 to watch this tree execute live.
+  ============================================================================
+-->
+<root BTCPP_format="4" main_tree_to_execute="TurtleHunter">
+
+  <BehaviorTree ID="TurtleHunter">
+    <Repeat num_cycles="-1">
+      <ForceSuccess name="LoopForever">
+        <Sequence name="HuntOneTurtle">
+
+          <!-- Step 1: wait until there is at least one prey turtle -->
+          <Fallback name="WaitForPrey">
+            <HasTargetTurtles name="AnyPreyAlive?"/>
+            <WaitForTurtle name="IdleWait" timeout_sec="1.0"/>
+          </Fallback>
+
+          <!-- Step 2: choose the CLOSEST target -->
+          <SelectNextTurtle
+            name="PickNearestTarget"
+            strategy="closest"
+            target_name="{target_name}"
+            target_x="{target_x}"
+            target_y="{target_y}"/>
+
+          <!-- Step 3: drive turtle1 toward the selected prey -->
+          <MoveTurtleToTarget
+            name="ChaseTarget"
+            target_x="{target_x}"
+            target_y="{target_y}"
+            target_name="{target_name}"
+            catch_distance="0.5"
+            linear_gain="1.5"
+            angular_gain="4.0"/>
+
+          <!-- Step 4: kill the turtle and remove it from the prey list -->
+          <CatchTurtle
+            name="EliminatePrey"
+            target_name="{target_name}"/>
+
+        </Sequence>
+      </ForceSuccess>
+    </Repeat>
+  </BehaviorTree>
+
+  <!-- ======================================================================
+       TreeNodesModel — required by Groot2 to display ports and descriptions
+  ====================================================================== -->
+  <TreeNodesModel>
+
+    <Condition ID="HasTargetTurtles"
+               editable="false">
+      <!-- No ports — reads "turtle_list" directly from the blackboard -->
+    </Condition>
+
+    <Condition ID="IsTurtleCaught"
+               editable="false">
+      <input_port name="catch_distance" default="0.5" type="double">
+        Distance (m) at which the turtle is considered caught
+      </input_port>
+      <input_port name="target_x" type="double">Target X coordinate</input_port>
+      <input_port name="target_y" type="double">Target Y coordinate</input_port>
+    </Condition>
+
+    <Action ID="SelectNextTurtle">
+      <input_port name="strategy" default="sequential" type="std::string">
+        Catching strategy: 'sequential' (FIFO) or 'closest' (nearest first)
+      </input_port>
+      <output_port name="target_name" type="std::string">Name of selected prey</output_port>
+      <output_port name="target_x"    type="double">X position of selected prey</output_port>
+      <output_port name="target_y"    type="double">Y position of selected prey</output_port>
+    </Action>
+
+    <Action ID="MoveTurtleToTarget">
+      <input_port name="target_x"       type="double">Target X position</input_port>
+      <input_port name="target_y"       type="double">Target Y position</input_port>
+      <input_port name="target_name"    type="std::string">Target name (for logging)</input_port>
+      <input_port name="catch_distance" default="0.5"  type="double">Catch radius (m)</input_port>
+      <input_port name="linear_gain"    default="1.5"  type="double">Linear P gain</input_port>
+      <input_port name="angular_gain"   default="4.0"  type="double">Angular P gain</input_port>
+      <input_port name="max_linear_speed"  default="2.0" type="double">Max forward speed (m/s)</input_port>
+      <input_port name="max_angular_speed" default="3.0" type="double">Max turn rate (rad/s)</input_port>
+      <input_port name="heading_tolerance" default="0.4" type="double">Turn-in-place threshold (rad)</input_port>
+    </Action>
+
+    <Action ID="CatchTurtle">
+      <input_port name="target_name" type="std::string">Name of turtle to kill</input_port>
+    </Action>
+
+    <Action ID="WaitForTurtle">
+      <input_port name="timeout_sec" default="1.0" type="double">
+        Wait duration in seconds before returning FAILURE
+      </input_port>
+    </Action>
+
+  </TreeNodesModel>
+
+</root>

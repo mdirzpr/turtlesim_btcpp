@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>bt_turtlesim_ctrl</name>
+  <version>1.0.0</version>
+  <description>
+    BehaviorTree.CPP-based controller for turtlesim.
+    Spawns prey turtles at random positions every 2-4 seconds and uses a
+    behavior tree to hunt them with two selectable strategies:
+      - sequential: catch turtles in the order they appeared
+      - closest:    always chase the nearest turtle first
+  </description>
+
+  <maintainer email="mahdi.rezapour@dfki.de">Mahdi Rezapour</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>ament_index_cpp</depend>
+  <depend>behaviortree_cpp</depend>
+  <depend>turtlesim</depend>
+  <depend>geometry_msgs</depend>
+  <depend>bt_turtlesim_interfaces</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
