@@ -1,0 +1,8 @@
+{
+  "file_format": "1.0",
+  "description": "bt_turtlesim_ctrl — Groot2 project file",
+  "xml_files": [
+    "turtle_hunter_sequential.xml",
+    "turtle_hunter_closest.xml"
+  ]
+}
