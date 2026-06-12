@@ -14,11 +14,11 @@ CROSS="❌"
 INFO="ℹ️ "
 
 # Set workspace variable
-BASE_WS=${BASE_WS:-bt_ros2_ws}
+BASE_WS=${BASE_WS:-bt_turtlesim_ws}
 
 echo ""
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${BLUE}   BT Engine Development Environment${NC}"
+echo -e "${BLUE}   Turtlesim BT Control Development Environment${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
@@ -59,8 +59,8 @@ fi
 echo ""
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${GREEN}Ready! ${NC}Type your commands below or run:"
-echo -e "  ${BLUE}colcon build --packages-select bt_engine${NC}"
-echo -e "  ${BLUE}ros2 launch bt_engine opcua_test.launch.py${NC}"
+echo -e "  ${BLUE}colcon build --packages-select bt_turtlesim_ctrl${NC}"
+echo -e "  ${BLUE}ros2 launch bt_turtlesim_ctrl turtlesim_bt.launch.py${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 

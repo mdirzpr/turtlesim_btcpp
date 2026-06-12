@@ -32,7 +32,7 @@ ARG GROOT2_VERSION=v1.6.1
 #   - Foundation layer with ROS 2 and all external dependencies
 #   - Contains BehaviorTree.CPP and Groot2
 #   - Shared by all subsequent stages to maximize layer reuse
-#   - Built in /bt_ros2_ws workspace (base workspace)
+#   - Built in /bt_turtlesim_ws workspace (base workspace)
 #
 # Key Components:
 #   - ROS 2 Jazzy base image
@@ -83,7 +83,7 @@ ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 RUN pip3 install --break-system-packages matplotlib transforms3d
 
 ################################################################################
-# 🏗️ BASE WORKSPACE: /bt_ros2_ws
+# 🏗️ BASE WORKSPACE: /bt_turtlesim_ws
 #
 # Purpose:
 #   - Build external dependencies that rarely change
@@ -98,7 +98,7 @@ RUN pip3 install --break-system-packages matplotlib transforms3d
 #   2. Install dependencies with rosdep
 #   3. Build with colcon (creates install/, build/, log/ directories)
 ################################################################################
-ARG PROJECT_WS=bt_ros2_ws
+ARG PROJECT_WS=bt_turtlesim_ws
 RUN mkdir -p /${PROJECT_WS}/src
 WORKDIR /${PROJECT_WS}/src
 
@@ -169,7 +169,7 @@ ENV NO_AT_BRIDGE 1
 # Script location: /entrypoint.sh
 # Sources (in order):
 #   1. /opt/ros/${ROS_DISTRO}/setup.bash (ROS 2 base)
-#   2. /bt_ros2_ws/install/setup.bash (external dependencies)
+#   2. /bt_turtlesim_ws/install/setup.bash (external dependencies)
 #   3. /dev_ws/install/setup.bash (development packages - dev stage only)
 ################################################################################
 WORKDIR /${PROJECT_WS}
@@ -274,7 +274,7 @@ RUN mv /root/Groot2.AppImage /home/${USERNAME}/Groot2.AppImage \
 #
 # Purpose:
 #   - Development workspace for project-specific packages
-#   - Overlays base workspace (/bt_ros2_ws) for dependency resolution
+#   - Overlays base workspace (/bt_turtlesim_ws) for dependency resolution
 #   - Mounted as volume for live code editing (see docker-compose.yaml)
 #
 # Initial build (in image):
@@ -310,7 +310,7 @@ RUN chown -R ${UID}:${GID} /dev_ws/
 #
 # Entrypoint sourcing order:
 #   - ROS 2 base environment
-#   - Base workspace (/bt_ros2_ws)
+#   - Base workspace (/bt_turtlesim_ws)
 #   - Dev workspace (/dev_ws)
 ################################################################################
 USER ${USERNAME}

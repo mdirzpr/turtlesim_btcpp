@@ -49,7 +49,7 @@ services:
   #   - Background:  docker compose up -d dev (use docker exec to attach)
   #
   # Workspace Layout:
-  #   - /bt_ros2_ws:  Base workspace (external dependencies) - built in image
+  #   - /bt_turtlesim_ws:  Base workspace (external dependencies) - built in image
   #   - /dev_ws:      Overlay workspace (project code) - mounted from host
   #   - ~/.colcon:    Build artifacts - persistent across restarts
   ################################################################################
