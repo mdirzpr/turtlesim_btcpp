@@ -1,4 +1,8 @@
-# 🤖 BehaviorTree.CPP ROS 2 Demo
+# BehaviorTree.CPP ROS 2 Demo
+
+<p align="center">
+  <img src="docs/banner.png" alt="BehaviorTree.CPP ROS 2 Turtlesim prey-hunter demo with live Groot2 visualization" width="100%">
+</p>
 
 A **BehaviorTree.CPP v4** showcase running in a containerized ROS 2 Jazzy environment with live Groot2 visualization.
 
@@ -53,13 +57,7 @@ Groot2 opens automatically. Click **Connect** and enter the port for the demo.
 
 ### How it works
 
-```
-turtle_spawner  ──(/new_turtle)──►  turtle_controller  ──(/turtle1/cmd_vel)──►  turtlesim
-                                                        ◄──(/turtle1/pose)──────
-                                                        ──(/kill)──────────────►
-```
-
-1. **`turtle_spawner`** creates a new prey turtle at a random position on the canvas every 5–7 seconds (configurable).
+1. **`turtle_spawner`** creates a new prey turtle at a random position on the canvas every 2–4 seconds (configurable).
 2. **`turtle_controller`** runs a behavior tree that drives `turtle1` to catch and eliminate each prey.
 3. Two hunting strategies are available — selected at launch time:
 
@@ -71,7 +69,7 @@ turtle_spawner  ──(/new_turtle)──►  turtle_controller  ──(/turtle1
 ### Launch options
 
 ```bash
-# Default (sequential, spawn every 5–7 s, Groot2 enabled)
+# Default (sequential, spawn every 2–4 s, Groot2 enabled)
 ros2 launch bt_turtlesim_ctrl turtlesim_bt.launch.py
 
 # Closest-first strategy
@@ -83,38 +81,6 @@ ros2 launch bt_turtlesim_ctrl turtlesim_bt.launch.py min_interval:=2.0 max_inter
 # Without Groot2
 ros2 launch bt_turtlesim_ctrl turtlesim_bt.launch.py enable_groot:=false
 ```
-
-### BT nodes
-
-#### Condition nodes
-| Node | Returns SUCCESS when… |
-|------|----------------------|
-| `HasTargetTurtles` | Prey list is non-empty |
-| `IsTurtleCaught` | `turtle1` is within `catch_distance` (0.5 m) of the target |
-
-#### Action nodes
-| Node | Type | Description |
-|------|------|-------------|
-| `SelectNextTurtle` | Sync | Picks the next target from the prey list using `strategy` port |
-| `MoveTurtleToTarget` | Stateful | Proportional controller — turns then drives toward the target |
-| `CatchTurtle` | Sync | Calls `/kill` service and removes turtle from the prey list |
-| `WaitForTurtle` | Stateful | Idles for `timeout_sec` when the canvas is empty, then FAILURE |
-
-### Behavior tree structure
-
-```
-Repeat(∞)
-  ForceSuccess           ← keeps the loop alive even when no prey exists
-    Sequence "HuntOneTurtle"
-      Fallback "WaitForPrey"
-        HasTargetTurtles        ← succeed immediately if prey exists
-        WaitForTurtle(1 s)      ← polite idle when canvas is empty
-      SelectNextTurtle          ← strategy hard-coded in the XML
-      MoveTurtleToTarget        ← proportional controller
-      CatchTurtle               ← /kill + remove from list
-```
-
-Both strategy XMLs are in `bt_turtlesim_ctrl/bt_structures/`. Open `turtlesim.btproj` in Groot2 to edit or inspect them.
 
 ---
 
@@ -133,34 +99,6 @@ Groot2 launches automatically with every demo. To connect manually:
 1. Open Groot2 → click **Connect**
 2. Enter the port above
 3. The live tree will appear with node status colors
-
----
-
-## 📁 Project Structure
-
-```
-bt_turtlesim/
-├── docker/
-│   └── Dockerfile                    # Multi-stage build (base + dev)
-├── docker-compose.yaml
-├── dependencies.repos                # BehaviorTree.CPP source dependency
-│
-├── interfaces/                       # bt_turtlesim_interfaces package
-│   └── msg/TurtleTarget.msg          # name + x + y of a spawned prey
-│
-└── bt_turtlesim_ctrl/                # Turtlesim prey-hunting package
-    ├── include/turtle_bt_nodes.h     # All BT node declarations
-    ├── src/
-    │   ├── turtle_bt_nodes.cpp       # BT node implementations
-    │   ├── turtle_controller_node.cpp# BT executor + ROS subscriptions
-    │   └── turtle_spawner_node.cpp   # Periodic prey spawner
-    ├── bt_structures/
-    │   ├── turtle_hunter_sequential.xml
-    │   ├── turtle_hunter_closest.xml
-    │   └── turtlesim.btproj          # Groot2 project file
-    ├── launch/turtlesim_bt.launch.py
-    └── config/params.yaml
-```
 
 ---
 
